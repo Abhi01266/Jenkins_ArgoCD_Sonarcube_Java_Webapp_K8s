@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'abhibondar/maven-plus-docker'
+      image 'abhibondar/jenkins-project-java-deployment'
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
   }
@@ -24,7 +24,7 @@ pipeline {
     }
     stage('Build and Push Docker Image') {
       environment {
-        DOCKER_IMAGE = "abhibondar/jenkins-project-java-deployment:${BUILD_NUMBER}"
+        DOCKER_IMAGE = "abhibondar/jenkins-project:${BUILD_NUMBER}"
         REGISTRY_CREDENTIALS = credentials('dockerHub')
       }
       steps {
