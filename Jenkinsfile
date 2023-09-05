@@ -8,8 +8,8 @@ pipeline {
   stages {
     stage('Build and Test') {
       steps {
-        // build the project and create a JAR file
-        sh 'mvn clean package'
+        // Build the project and create a JAR file
+        bat 'mvn clean package' // Use 'bat' for Windows batch commands
       }
     }
     stage('Code Analysis with SonarQube') {
@@ -18,44 +18,44 @@ pipeline {
       }
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+          bat 'mvn sonar:sonar -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.host.url=%SONAR_URL%'
         }
       }
     }
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "abhibondar/java_awesome-cicd:${BUILD_NUMBER}"
-        REGISTRY_CREDENTIALS = credentials('dockerHub')
       }
       steps {
         script {
-            sh 'docker build -t ${DOCKER_IMAGE} .'
-            def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', "dockerHub") {
-                dockerImage.push()
-            }
+          // Build the Docker image
+          bat "docker build -t %DOCKER_IMAGE% ."
+          def dockerImage = docker.image("%DOCKER_IMAGE%")
+          docker.withRegistry('https://index.docker.io/v1/', 'dockerHub') {
+            dockerImage.push()
+          }
         }
       }
     }
     stage('Update Deployment File') {
-        environment {
-            GIT_REPO_NAME = "Jenkins_ArgoCD_Sonarcube_Java_Webapp_K8s"
-            GIT_USER_NAME = "abhibondar"
+      environment {
+        GIT_REPO_NAME = "Jenkins_ArgoCD_Sonarcube_Java_Webapp_K8s"
+        GIT_USER_NAME = "Abhi01266"
+      }
+      steps {
+        withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+          bat '''
+            git config user.email "abhibondar01@gmail.com"
+            git config user.name "Abhijeet Bondar"
+            SET BUILD_NUMBER=%BUILD_NUMBER%
+            (Get-Content manifests\deployment.yml).replace('replaceImageTag', %BUILD_NUMBER%) | Set-Content manifests\deployment.yml
+            git add manifests\deployment.yml
+            git add target\
+            git commit -m "Update image version %BUILD_NUMBER%"
+            git push https://%GITHUB_TOKEN%@github.com/%GIT_USER_NAME%/%GIT_REPO_NAME% HEAD:main
+          '''
         }
-        steps {
-            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config user.email "abhibondar01@gmail.com"
-                    git config user.name "Abhijeet Bondar"
-                    BUILD_NUMBER=${BUILD_NUMBER}
-                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" manifests/deployment.yml
-                    git add manifests/deployment.yml
-                    git add target/
-                    git commit -m "Update image version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                '''
-            }
-        }
+      }
     }
   }
 }
