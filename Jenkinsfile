@@ -24,7 +24,7 @@ pipeline {
     }
     stage('Build and Push Docker Image') {
       environment {
-        DOCKER_IMAGE = "abhibondar/java_awesome-cicd:${BUILD_NUMBER}"
+        DOCKER_IMAGE = "abhibondar/jenkins-project-java-deployment:${BUILD_NUMBER}"
         REGISTRY_CREDENTIALS = credentials('dockerHub')
       }
       steps {
