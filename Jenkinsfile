@@ -1,8 +1,8 @@
 pipeline {
   agent {
     docker {
-      image 'abhibondar/maven-plus-docker'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+      image 'abhibondar/maven-plus-docker' // Use a Maven and Docker image
+            args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket to access host's Docker daemon
     }
   }
   stages {
