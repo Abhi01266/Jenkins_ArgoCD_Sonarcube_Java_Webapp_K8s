@@ -4,7 +4,7 @@ pipeline {
         stage('Build and Test') {
             agent {
     docker {
-      image 'ubuntu:18.04' // Use a Maven and Docker image
+      image 'abhibondar/maven-plus-docker' // Use a Maven and Docker image
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket to access host's Docker daemon
     }
   }
