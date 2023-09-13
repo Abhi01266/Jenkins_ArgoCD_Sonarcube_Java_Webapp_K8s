@@ -9,7 +9,7 @@ pipeline {
     stage('Checkout') {
       steps {
         sh 'echo passed'
-        //git branch: 'main', url: 'https://chaitannyaa.hashnode.dev/project-01-continuous-integration-and-deployment-cicd-with-jenkins-and-argocd/'
+        //git branch: 'main', url: 'https://github.com/Abhi01266/Jenkins_ArgoCD_Sonarcube_Java_Webapp_K8s.git'
       }
     }
     stage('Build and Test') {
