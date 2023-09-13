@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: abhibondar/java_awesome-cicd
+        image: abhibondar/java_awesome-cicd:1
         ports:
         - containerPort: 8080
